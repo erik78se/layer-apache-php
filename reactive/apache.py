@@ -6,6 +6,7 @@ from charmhelpers import fetch
 from charmhelpers.core import host
 from charmhelpers.core import hookenv
 from charmhelpers.core import templating
+from charmhelpers.core.host import lsb_release
 
 from charms import reactive
 from charms.reactive import hook
@@ -45,7 +46,10 @@ def config_changed():
 def install_packages(workload):
     config = hookenv.config()
     hookenv.status_set('maintenance', 'Installing packages')
-    packages = ['apache2', 'php5-cgi', 'libapache2-mod-php5']
+    if lsb_release()['DISTRIB_RELEASE'] >= '16.04':
+        packages = ['apache2', 'php-cgi', 'libapache2-mod-php']
+    else:
+        packages = ['apache2', 'php5-cgi', 'libapache2-mod-php5']
     packages.extend(workload['packages'])
     fetch.apt_install(fetch.filter_installed_packages(packages))
     host.service_stop('apache2')
