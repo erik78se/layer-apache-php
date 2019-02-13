@@ -1,5 +1,6 @@
 import os
 import yaml
+import tempfile
 from subprocess import check_call
 
 from charmhelpers import fetch
@@ -91,11 +92,11 @@ def strip_archive_dir(site_dir):
     contents = os.listdir(site_dir)
     if len(contents) != 1:
         return
-    subdir = os.path.join(site_dir, contents[0])
-    if not os.path.isdir(subdir):
+    archive_topdir = os.path.join(site_dir, contents[0])
+    if not os.path.isdir(archive_topdir):
         return
-    tmp_dest = os.path.join(os.path.dirname(site_dir), contents[0])
-    os.rename(subdir, tmp_dest)
+    tmp_dest = tempfile.mkdtemp(dir=os.path.dirname(site_dir))
+    os.rename(archive_topdir, tmp_dest)
     os.rmdir(site_dir)
     os.rename(tmp_dest, site_dir)
 
